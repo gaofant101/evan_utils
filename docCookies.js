@@ -20,45 +20,55 @@
 */
 
 export const docCookies = {
-    getItem: function (sKey) {
-        return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null
+    getItem(sKey) {
+        return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null; // eslint-disable-line
     },
-    setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
-        if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
-            return false
+    setItem(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+        if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { // eslint-disable-line
+            return false;
         }
-        var sExpires = ''
+        let sExpires = '';
         if (vEnd) {
             switch (vEnd.constructor) {
-            case Number:
-                sExpires = vEnd === Infinity ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : '; max-age=' + vEnd
-                break
-            case String:
-                sExpires = ';0 expires=' + vEnd
-                break
-            case Date:
-                sExpires = '; expires=' + vEnd.toUTCString()
-                break
+                case Number:
+                    sExpires = vEnd === Infinity ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : `; max-age=${vEnd}`;
+                    break;
+                case String:
+                    sExpires = `;0 expires=${vEnd}`;
+                    break;
+                case Date:
+                    sExpires = `; expires=${vEnd.toUTCString()}`;
+                    break;
+                default:
+                    sExpires = `; expires=${vEnd.toUTCString()}`;
+                    break;
             }
         }
-        document.cookie = encodeURIComponent(sKey) + '=' + encodeURIComponent(sValue) + sExpires + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '') + (bSecure ? '; secure' : '')
-        return true
+        // document.cookie = encodeURIComponent(sKey) + '=' + encodeURIComponent(sValue) + sExpires + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '') + (bSecure ? '; secure' : '')
+        const Domain = sDomain ? `; domain=${sDomain}` : '';
+        const Path = sPath ? `; path=${sPath}` : '';
+        const Secure = bSecure ? '; secure' : '';
+        document.cookie = `${encodeURIComponent(sKey)}=${encodeURIComponent(sValue)}${sExpires}${Domain}${Path}${Secure}`;
+        return true;
     },
-    removeItem: function (sKey, sPath, sDomain) {
+    removeItem(sKey, sPath, sDomain) {
         if (!sKey || !this.hasItem(sKey)) {
-            return false
+            return false;
         }
-        document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '')
-        return true
+        // document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '');
+        const Domain = sDomain ? `; domain=${sDomain}` : '';
+        const Path = sPath ? `; path=${sPath}` : '';
+        document.cookie = `${encodeURIComponent(sKey)}=; expires=Thu, 01 Jan 1970 00:00:00 GM ${Domain} ${Path}`;
+        return true;
     },
-    hasItem: function (sKey) {
-        return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=')).test(document.cookie)
+    hasItem(sKey) {
+        return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=')).test(document.cookie); // eslint-disable-line
     },
-    keys: /* optional method: you can safely remove it! */ function () {
-        var aKeys = document.cookie.replace(/((?:^|\s*;)[^=]+)(?=;|$)|^\s*|\s*(?:=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:=[^;]*)?;\s*/)
-        for (var nIdx = 0; nIdx < aKeys.length; nIdx++) {
-            aKeys[nIdx] = decodeURIComponent(aKeys[nIdx])
+    keys() {
+        const aKeys = document.cookie.replace(/((?:^|\s*;)[^=]+)(?=;|$)|^\s*|\s*(?:=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:=[^;]*)?;\s*/);
+        for (let nIdx = 0; nIdx < aKeys.length; nIdx += 1) {
+            aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]);
         }
-        return aKeys
-    }
-}
+        return aKeys;
+    },
+};
